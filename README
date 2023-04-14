@@ -1,0 +1,50 @@
+Compilers Project - CS5363 - Part 2 - Parser
+Jarrod Ragsdale
+nqg320
+
+Part 2 of Decaf compiler project implementing a Parser with 2-token lookahead capability.
+This is built on top of the scanner built in part 1.
+
+
+
+*** IMPLEMENTATION ***
+* SCANNER *
+This tokenizer implements a simple looping mechanism with a 3-stage tokenizer.
+
+--STAGE 1--
+The tokenizer splits tokens into chunks using spaces unless in string mode and newline characters unless in comment mode. This is handled using simple switches.
+
+--STAGE 2--
+The tokenizer then sends these token chunks to be split using regular expressions in a hierarchal manner, matching on more strict tokens before looser ones such as identifiers. If no match, sends for error checking.
+
+--STAGE 3--
+The tokenizer finishes off by formatting the token and doing a last sanity check before appending the token to the list for parsing. The tokenizer repeats these 3 stages until EOF.
+
+
+* PARSER *
+The Parser iterates over a list of tokens and recursively appends nodes to an abstract syntax tree (AST).
+These nodes extend the logic to string terminals together into their intended functionality, removing ambiguity via
+precedence enforced through recursion.
+
+When the next token matches a valid state to recurse into, that node is appended to that node's children list before continuing with matching.
+Terminal nodes also update the iterator before continuing to the next token.
+
+
+
+*** FILES ***
+lexer.py: Entrance file. Tokenizes Decaf file and stores tokens into list for parser.
+parser.py: Populates root AST node via recursion, iterating through the token list.
+parser_classes.py: Definitions of each AST node.
+parser_print.py: Logic for printing AST tree per the sample format.
+workdir/build.sh: Placeholder script since Python is interpretive.
+workdir/exec.sh: Script to execute program per the rubric.
+
+
+
+*** USAGE ***
+NOTE: Only tested in Python 3.4.3 and 3.10 environments.
+
+Packages used: re, sys: Python stdlib
+
+python3 lexer.py <*.decaf>
+workdir/exec.sh <*.decaf>
