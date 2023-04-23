@@ -6,7 +6,7 @@ class SymbolEntry:
     block_level = 0  # 1 = global, 2 = local/parameter
     ref_type = ""  # var or func
     scope = 0  # global, local, parameter
-    offset = 0  # no clue
+    offset = -1  # no clue
     formal_table = {}  # table of formals for fnDecl table entries (method checking for calls)
 
     register = 0
@@ -20,6 +20,7 @@ class SymbolEntry:
         self.formal_table = in_formals if in_formals is not None else {}
         self.ref_type = in_ref_type if in_ref_type is not None else ""
         self.register = 0
+        self.offset = in_offset if in_offset is not None else -1
 
 
 class SymbolTable:
@@ -28,24 +29,36 @@ class SymbolTable:
     semantic_error_str = ""
     semantic_err = 0
 
-    current_reg = 0
-    current_label = 0
+    current_reg = -1
+    func_label = 0  # jumps for funcs/stmts
+    data_label = 0  # strings, etc.
 
     def __init__(self):
         self.stack = []  # list of dicts. first is global
         self.active_nodes = []
         self.semantic_error_str = ""
         self.semantic_err = 0
-        self.current_reg = 0
-        self.current_label = 0
+        self.current_reg = -1
+        self.func_label = 0
+        self.data_label = 0
 
-    def next_reg(self):
+    def get_next_reg(self):
         self.current_reg += 1
-        return self.current_reg
+        return self.current_reg % 3  # t0, t1, t2
 
-    def next_label(self):
-        self.current_label += 1
-        return self.current_label
+    def get_num_locals(self):
+        num_locals = 0
+        for table in reversed(self.stack[:-1]):
+            num_locals += table.keys()
+        return num_locals
+
+    def get_next_func_label(self):
+        self.func_label += 1
+        return self.func_label
+
+    def get_next_data_label(self):
+        self.data_label += 1
+        return self.data_label
 
     def inc_err_cnt(self):
         self.semantic_err += 1
@@ -55,7 +68,7 @@ class SymbolTable:
 
     def check_err(self):
         print(self.semantic_error_str)
-    
+
     def lookup_entry(self, ident=""):
         """
         Gets most local symbolentry of ident

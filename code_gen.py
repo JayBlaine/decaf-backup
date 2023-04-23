@@ -7,8 +7,10 @@ def check_link_err(ast_tree=None):
 
 
 def build_code(ast_tree=None):
+    p=1
+    ast_tree.set_stack_location()
     ast_tree.code_visit()
 
 
-def emit(instr=None, label=None, type=0):
-    p=1
+def emit(string):
+    print('  {}'.format(string))
