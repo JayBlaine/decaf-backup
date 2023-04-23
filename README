@@ -1,9 +1,9 @@
-Compilers Project - CS5363 - Part 2 - Parser
+Compilers Project - CS5363 - Part 3 - Semantic Analysis / Code Generation
 Jarrod Ragsdale
 nqg320
 
-Part 2 of Decaf compiler project implementing a Parser with 2-token lookahead capability.
-This is built on top of the scanner built in part 1.
+Part 3 of Decaf compiler project implementing semantic analysis and code generation in a 3-pass fashion using naive register assignment.
+This is built on top of the scanner and parser built in part 1 and 2 respectively.
 
 
 
@@ -29,13 +29,28 @@ precedence enforced through recursion.
 When the next token matches a valid state to recurse into, that node is appended to that node's children list before continuing with matching.
 Terminal nodes also update the iterator before continuing to the next token.
 
+* SEMANTIC ANALYSIS *
+Semantic analysis takes place by iterating through the AST to find type mismatches in expression operands, invalid function calls, improper
+loop mechanisms, and calling non-instantiated variables/functions. This is accomplished through the use of a symbol table populated by symbol entries
+in accordance to their scope. A second stack is used for all nodes traversed to keep track of active loops and functions.
+
+* CODE GENERATION *
+Code generation first checks for a main function before generating machine code for MIPS over a SPIM simulator. This part also recurses
+through the AST, emitting machine instructions using global or local addresses stored in 1 of 3 local registers depending on the variable's scope.
+Branching is handled through label generation for loops and conditional statements. Function calling is handled by pushing the parameters in reverse
+before updating the stack pointer and jumping to that function's label. NOTE: IF A VARIABLE EXISTS BUT NO ASSIGN EXPR HAS HAPPENED FOR THAT VARIABLE,
+IT DEFAULTS TO 0.
 
 
 *** FILES ***
 lexer.py: Entrance file. Tokenizes Decaf file and stores tokens into list for parser.
 parser.py: Populates root AST node via recursion, iterating through the token list.
-parser_classes.py: Definitions of each AST node.
+parser_classes.py: Definitions of each AST node along with code genration and semantic analysis logic for each node type.
 parser_print.py: Logic for printing AST tree per the sample format.
+symbol_table.py: Class definitions for symbol table and symboltable entries.
+semantic.py: Calls for checking of semantic error functions starting at the root (program) node.
+code_gen.py: Calls for link error checking and code generation to be printed to stdout.
+defs.asm: Definitions to be appended to file that stdout is redirected to.
 workdir/build.sh: Placeholder script since Python is interpretive.
 workdir/exec.sh: Script to execute program per the rubric.
 

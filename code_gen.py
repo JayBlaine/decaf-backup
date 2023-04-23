@@ -1,5 +1,6 @@
 from decaf import sym_table
 
+
 def check_link_err(ast_tree=None):
     if 'main' not in ast_tree.var_table.keys() or ast_tree.var_table['main'].ref_type != 'func':
         print('\n*** Error.\n*** Linker: function \'main\' not defined\n')
@@ -7,7 +8,6 @@ def check_link_err(ast_tree=None):
 
 
 def build_code(ast_tree=None):
-    p=1
     ast_tree.set_stack_location()
     ast_tree.code_visit()
 
